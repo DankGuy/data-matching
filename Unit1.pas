@@ -30,9 +30,13 @@ type
     procedure OpenPDF();
     procedure ReadXML();
     procedure UpdateObjectList();
+    procedure MatchObject();
+    procedure ImageEnView1ButtonClick(Sender: TObject; Button: TIEVButton;
+        MouseButton: TMouseButton; Shift: TShiftState; var Handled: Boolean);
   private
     { Private declarations }
     lTxtObjectList: TArray<String>;
+    lHighlightIndex: Integer;
   public
     { Public declarations }
   end;
@@ -59,7 +63,6 @@ begin
   end;
 end;
 
-
 // ----Form Methods---- //
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -69,7 +72,9 @@ begin
 
   // Display a PDF document (and allow text and image selection)
   ImageEnView1.PdfViewer.Enabled := true;
+//  ImageEnView1.PdfViewer.ShowAllPages := True;
   ImageEnView1.MouseInteractGeneral := [ miPdfSelectText ];
+
 
   Main();
 end;
@@ -79,6 +84,7 @@ begin
   OpenPDF();
   UpdateObjectList();
   ReadXML();
+  MatchObject();
 end;
 
 procedure TForm1.OpenPDF();
@@ -145,6 +151,55 @@ begin
   if Length(lTxtObjectList) = 0 then
     ShowMessage('No PDF Object Found.');
 
+end;
+
+procedure TForm1.MatchObject();
+begin
+  var lFound: boolean := False;
+  
+  // compare the lTxtObjectList with the clientdataset
+  for var j := 1 to ClientDataSet1.RecordCount do
+  begin
+    ClientDataSet1.RecNo := j;
+    lFound := False;
+    
+    for var i := 0 to ImageEnView1.PdfViewer.Objects.Count - 1 do
+    begin
+      if lFound then Break;
+      if ImageEnView1.PdfViewer.Objects[i].ObjectType = ptText then
+        begin
+          if ImageEnView1.PdfViewer.Objects[i].Text.Contains(ClientDataSet1.FieldByName('Value').AsString) then
+          begin
+            lFound := True;
+            lHighlightIndex := i;
+            ImageEnView1.HighlightColor := clRed;
+            ImageEnView1.PdfViewer.Objects.HighlightedIndex := i;
+            ImageEnView1.Invalidate();         
+          end;
+        end;
+    end;
+  end;
+end;
+
+// Button Click event of our TImageEnView
+procedure TForm1.ImageEnView1ButtonClick(Sender: TObject; Button: TIEVButton;
+    MouseButton: TMouseButton; Shift: TShiftState; var Handled: Boolean);
+begin
+  case Button of
+    iebtPrevious : begin
+                     if ssShift in Shift then
+                       ImageEnView1.Seek( ieioSeekFirst )
+                     else
+                       ImageEnView1.Seek( ieioSeekPrior );
+                   end;
+    iebtNext     : begin
+                     if ssShift in Shift then
+                       ImageEnView1.Seek( ieioSeekLast )
+                     else
+                       ImageEnView1.Seek( ieioSeekNext );
+                   end;
+  end;
+  MatchObject();
 end;
 
 end.

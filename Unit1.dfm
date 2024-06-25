@@ -10,21 +10,23 @@ object Form1: TForm1
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Position = poDesigned
   OnCreate = FormCreate
   TextHeight = 15
   object ImageEnView1: TImageEnView
     Left = 0
     Top = 8
-    Width = 649
+    Width = 625
     Height = 569
     TabOrder = 0
     AutoStretch = True
     AutoShrink = True
+    OnButtonClick = ImageEnView1ButtonClick
   end
   object cxGrid1: TcxGrid
-    Left = 640
+    Left = 624
     Top = 8
-    Width = 398
+    Width = 414
     Height = 569
     TabOrder = 1
     object cxGrid1DBTableView1: TcxGridDBTableView

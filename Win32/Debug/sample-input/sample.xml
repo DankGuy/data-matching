@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="yes"?>
+<DATAPACKET Version="2.0">
+  <METADATA>
+    <FIELDS>
+      <FIELD attrname="TIN" fieldtype="string.uni" WIDTH="15"/>
+      <FIELD attrname="NAME" fieldtype="string.uni" WIDTH="50"/>
+      <FIELD attrname="AMOUNT" fieldtype="r8"/>
+    </FIELDS>
+    <PARAMS/>
+  </METADATA>
+  <ROWDATA>
+    <ROW TIN="+49 9371 9786-0" NAME="John" AMOUNT="381,12"/>
+  </ROWDATA>
+</DATAPACKET>

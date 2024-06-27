@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   Caption = 'Matching Data'
   ClientHeight = 622
-  ClientWidth = 1046
+  ClientWidth = 1071
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,19 +15,22 @@ object Form1: TForm1
   TextHeight = 15
   object ImageEnView1: TImageEnView
     Left = 0
-    Top = 8
+    Top = 0
     Width = 625
-    Height = 569
+    Height = 574
+    Align = alLeft
     TabOrder = 0
     AutoStretch = True
     AutoShrink = True
     OnButtonClick = ImageEnView1ButtonClick
   end
   object cxGrid1: TcxGrid
-    Left = 624
-    Top = 8
-    Width = 414
-    Height = 569
+    Left = 616
+    Top = 0
+    Width = 455
+    Height = 574
+    Align = alRight
+    Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     object cxGrid1DBTableView1: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
@@ -54,18 +57,23 @@ object Form1: TForm1
   end
   object Panel1: TPanel
     Left = 0
-    Top = 576
-    Width = 1038
+    Top = 574
+    Width = 1071
     Height = 48
+    Align = alBottom
     TabOrder = 2
+    DesignSize = (
+      1071
+      48)
     object Label1: TLabel
-      Left = 8
+      Left = 0
       Top = 16
-      Width = 752
+      Width = 749
       Height = 21
+      Anchors = [akLeft, akTop, akRight, akBottom]
       Caption = 
-        'This page suggests that the field stated may have mistakes, you ' +
-        'are suggested to check the field values again.'
+        'This page shows the fields that are possibly match with the LHDN' +
+        ' validated data using red rectangle bounds.'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -16

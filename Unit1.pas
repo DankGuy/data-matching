@@ -13,8 +13,7 @@ uses
   Data.DB, cxDBData, Vcl.ExtCtrls, cxGridLevel, cxClasses, cxGridCustomView,
   cxGridCustomTableView, cxGridTableView, cxGridDBTableView, cxGrid, ieview,
   imageenview, Vcl.StdCtrls, Datasnap.DBClient, Xml.XMLDoc, Xml.XMLIntf,
-  iexPDFiumCore,
-  System.Generics.Collections;
+  iexPDFiumCore;
 
 type
   TForm1 = class(TForm)
@@ -25,16 +24,14 @@ type
     Panel1: TPanel;
     Label1: TLabel;
     DataSource1: TDataSource;
-    ClientDataSet1: TClientDataSet;
-    Fields: TcxGridDBColumn;
-    Value: TcxGridDBColumn;
+    FClientDataSet1: TClientDataSet;
 
-    procedure FormCreate(Sender: TObject);
+    procedure FormCreate(sender: TObject);
     procedure ReadXML();
     procedure MatchObject();
-    procedure ImageEnView1ButtonClick(Sender: TObject; Button: TIEVButton;
-      MouseButton: TMouseButton; Shift: TShiftState; var Handled: Boolean);
-    procedure DrawBounds(ObjectIndex: Integer);
+    procedure ImageEnView1ButtonClick(sender: TObject; button: TIEVButton;
+        mouseButton: TMouseButton; shift: TShiftState; var handled: Boolean);
+    procedure DrawBounds(objectIndex: Integer);
   private
     { Private declarations }
   public
@@ -53,21 +50,21 @@ implementation
 {$R *.dfm}
 // ----Utility---- //
 
-function FindObjWidth(Obj: TPdfObject): Integer;
+function FindObjWidth(obj: TPdfObject): Integer;
 begin
-  Result := Obj.Bounds.Right - Obj.Bounds.Left;
+  Result := obj.Bounds.Right - obj.Bounds.Left;
 end;
 
-function FindObjHeight(Obj: TPdfObject): Integer;
+function FindObjHeight(obj: TPdfObject): Integer;
 begin
-  Result := Obj.Bounds.Bottom - Obj.Bounds.Top;
+  Result := obj.Bounds.Bottom - obj.Bounds.Top;
 end;
 
 // ----Form Methods---- //
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TForm1.FormCreate(sender: TObject);
 begin
-  // register the PDFium plug-in
+  // Register the PDFium plug-in
   IEGlobalSettings.RegisterPlugIns([iepiIEVision, iepiPDFium], '', '', false);
 
   // Display a PDF document (and allow text and image selection)
@@ -82,32 +79,32 @@ end;
 
 procedure TForm1.ReadXML();
 var
-  XMLDoc: IXMLDocument;
-  RowNode: IXMLNode;
-  FieldName, FieldValue: string;
+  lXMLDoc: IXMLDocument;
+  lRowNode: IXMLNode;
+  lFieldName, lFieldValue: string;
 begin
-  XMLDoc := LoadXMLDocument('sample-input\sample.xml');
+  lXMLDoc := LoadXMLDocument('sample-input\sample.xml');
 
-  // access the rootdata node
-  RowNode := XMLDoc.DocumentElement.ChildNodes['ROWDATA'].ChildNodes['ROW'];
+  // Access the rootdata node
+  lRowNode := lXMLDoc.DocumentElement.ChildNodes['ROWDATA'].ChildNodes['ROW'];
 
-  // initialise client dataset fields to extract the fields and values from XML
-  ClientDataSet1.Close;
-  ClientDataSet1.FieldDefs.Clear;
-  ClientDataSet1.FieldDefs.Add('Fields', ftString, 30);
-  ClientDataSet1.FieldDefs.Add('Value', ftString, 255);
-  ClientDataSet1.CreateDataSet;
+  // Initialise client dataset fields to extract the fields and values from XML
+  FClientDataSet1.Close;
+  FClientDataSet1.FieldDefs.Clear;
+  FClientDataSet1.FieldDefs.Add('Fields', ftString, 30);
+  FClientDataSet1.FieldDefs.Add('Value', ftString, 255);
+  FClientDataSet1.CreateDataSet;
 
   // Extract the field attribute and the values
-  for var i := 0 to RowNode.AttributeNodes.Count - 1 do
+  for var i := 0 to lRowNode.AttributeNodes.Count - 1 do
   begin
-    FieldName := RowNode.AttributeNodes[i].NodeName;
-    FieldValue := RowNode.Attributes[FieldName];
+    lFieldName := lRowNode.AttributeNodes[i].NodeName;
+    lFieldValue := lRowNode.Attributes[lFieldName];
 
-    ClientDataSet1.Append;
-    ClientDataSet1.FieldByName('Fields').AsString := FieldName;
-    ClientDataSet1.FieldByName('Value').AsString := FieldValue;
-    ClientDataSet1.Post;
+    FClientDataSet1.Append;
+    FClientDataSet1.FieldByName('Fields').AsString := lFieldName;
+    FClientDataSet1.FieldByName('Value').AsString := lFieldValue;
+    FClientDataSet1.Post;
   end;
 end;
 
@@ -116,20 +113,20 @@ begin
   var
     lFound: Boolean := false;
 
-  // compare the lTxtObjectList with the clientdataset
-  for var j := 1 to ClientDataSet1.RecordCount do
+  // Compare the lTxtObjectList with the clientdataset
+  for var j := 1 to FClientDataSet1.RecordCount do
   begin
-    ClientDataSet1.RecNo := j;
+    // Set ClientDataSet current head index
+    FClientDataSet1.RecNo := j;
     lFound := false;
 
     for var i := 0 to ImageEnView1.PdfViewer.Objects.Count - 1 do
     begin
-      if lFound then
-        Break;
+      if lFound then Break;
       if ImageEnView1.PdfViewer.Objects[i].ObjectType = ptText then
       begin
         if ImageEnView1.PdfViewer.Objects[i].Text.Contains
-          (ClientDataSet1.FieldByName('Value').AsString) then
+          (FClientDataSet1.FieldByName('Value').AsString) then
         begin
           DrawBounds(i);
         end;
@@ -138,51 +135,53 @@ begin
   end;
 end;
 
-// Button Click event of our TImageEnView
-procedure TForm1.ImageEnView1ButtonClick(Sender: TObject; Button: TIEVButton;
-  MouseButton: TMouseButton; Shift: TShiftState; var Handled: Boolean);
+// button Click event of our TImageEnView
+procedure TForm1.ImageEnView1ButtonClick(sender: TObject; button: TIEVButton;
+    mouseButton: TMouseButton; shift: TShiftState; var handled: Boolean);
 begin
-  case Button of
+  case button of
     iebtPrevious:
       begin
-        if ssShift in Shift then
+        // If press shift then skip to first page
+        if ssShift in shift then
           ImageEnView1.Seek(ieioSeekFirst)
         else
           ImageEnView1.Seek(ieioSeekPrior);
       end;
     iebtNext:
       begin
-        if ssShift in Shift then
+        // If press shift then skip to last page
+        if ssShift in shift then
           ImageEnView1.Seek(ieioSeekLast)
         else
           ImageEnView1.Seek(ieioSeekNext);
       end;
   end;
 
-  // call this method to make sure the red bounds won't disappear
+  // Call this method to make sure the red bounds won't disappear
   MatchObject();
 end;
 
-procedure TForm1.DrawBounds(ObjectIndex: Integer);
+procedure TForm1.DrawBounds(objectIndex: Integer);
 const
-  Rect_Color = clRed;
-  Rect_Border = 1;
-  Rect_Opacity = 0;
-  Rect_Offset = 2;
+  c_Rect_Color = clRed;
+  c_Rect_Border = 1;
+  c_Rect_Opacity = 0;
+  c_Rect_Offset = 2; // To add some extra space in the bounds
 var
-  Obj: TPdfObject;
+  lObj: TPdfObject;
 
 begin
-  Obj := ImageEnView1.PdfViewer.Objects.AddRect
-    (ImageEnView1.PdfViewer.Objects[ObjectIndex].X,
-    ImageEnView1.PdfViewer.Objects[ObjectIndex].Y,
-    FindObjWidth(ImageEnView1.PdfViewer.Objects[ObjectIndex]) + Rect_Offset,
-    FindObjHeight(ImageEnView1.PdfViewer.Objects[ObjectIndex]) + Rect_Offset);
+  lObj := ImageEnView1.PdfViewer.Objects.AddRect
+    (ImageEnView1.PdfViewer.Objects[objectIndex].X,
+    ImageEnView1.PdfViewer.Objects[objectIndex].Y,
+    FindObjWidth(ImageEnView1.PdfViewer.Objects[objectIndex]) + c_Rect_Offset,
+    FindObjHeight(ImageEnView1.PdfViewer.Objects[objectIndex]) + c_Rect_Offset);
 
-  Obj.StrokeColor := TColor2TRGBA(Rect_Color, 255);
-  Obj.PathStrokeWidth := Rect_Border;
-  Obj.FillColor := TColor2TRGBA(Rect_Opacity);
-  Obj.PathFillMode := pfAlternate;
+  lObj.StrokeColor := TColor2TRGBA(c_Rect_Color, 255);
+  lObj.PathStrokeWidth := c_Rect_Border;
+  lObj.FillColor := TColor2TRGBA(c_Rect_Opacity);
+  lObj.PathFillMode := pfAlternate;
 
   ImageEnView1.Invalidate();
 end;

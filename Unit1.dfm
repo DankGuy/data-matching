@@ -83,11 +83,11 @@ object Form1: TForm1
     end
   end
   object DataSource1: TDataSource
-    DataSet = ClientDataSet1
+    DataSet = FClientDataSet1
     Left = 656
     Top = 72
   end
-  object ClientDataSet1: TClientDataSet
+  object FClientDataSet1: TClientDataSet
     PersistDataPacket.Data = {
       800000009619E0BD0100000018000000030001000000030000005A000354494E
       01004A0010000100055749445448020002000F00044E414D4501004A00100001

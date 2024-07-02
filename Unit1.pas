@@ -3,17 +3,19 @@ unit Unit1;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.SysUtils,
   System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, hyiedefs, hyieutils, iexBitmaps,
-  iesettings, iexLayers, iexRulers, iexToolbars, iexUserInteractions, imageenio,
+  Vcl.Controls, Vcl.Forms, hyieutils,
+  iesettings, iexUserInteractions, imageenio,
+  Data.DB, Vcl.ExtCtrls, cxGridLevel, cxGridCustomView,
+  cxGridDBTableView, cxGrid, ieview,
+  imageenview, Vcl.StdCtrls, Datasnap.DBClient, Xml.XMLDoc, Xml.XMLIntf,
+  iexPDFiumCore, hyiedefs, iexBitmaps, iexLayers, iexRulers, iexToolbars,
   imageenproc, iexProcEffects, cxGraphics, cxControls, cxLookAndFeels,
   cxLookAndFeelPainters, cxStyles, cxCustomData, cxFilter, cxData,
   cxDataStorage, cxEdit, cxNavigator, dxDateRanges, dxScrollbarAnnotations,
-  Data.DB, cxDBData, Vcl.ExtCtrls, cxGridLevel, cxClasses, cxGridCustomView,
-  cxGridCustomTableView, cxGridTableView, cxGridDBTableView, cxGrid, ieview,
-  imageenview, Vcl.StdCtrls, Datasnap.DBClient, Xml.XMLDoc, Xml.XMLIntf,
-  iexPDFiumCore;
+  cxDBData, cxGridCustomTableView, cxGridTableView, cxClasses, ieopensavedlg,
+  Vcl.Menus, cxButtons;
 
 type
   TForm1 = class(TForm)
@@ -25,6 +27,8 @@ type
     Label1: TLabel;
     DataSource1: TDataSource;
     FClientDataSet1: TClientDataSet;
+    SaveImageEnDialog1: TSaveImageEnDialog;
+    saveButton: TcxButton;
 
     procedure FormCreate(sender: TObject);
     procedure ReadXML();
@@ -32,6 +36,7 @@ type
     procedure ImageEnView1ButtonClick(sender: TObject; button: TIEVButton;
         mouseButton: TMouseButton; shift: TShiftState; var handled: Boolean);
     procedure DrawBounds(objectIndex: Integer);
+    procedure saveButtonClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -108,6 +113,25 @@ begin
   end;
 end;
 
+//procedure TForm1.saveButtonClick(Sender: TObject);
+//begin
+//  SaveImageEnDialog1.AutoSetFilterFileType := ioPDF;
+//  if SaveImageEnDialog1.Execute() then
+//    ImageEnView1.IO.SaveToFile( SaveImageEnDialog1.FileName );
+//end;
+
+procedure TForm1.saveButtonClick(Sender: TObject);
+begin
+  if SaveImageEnDialog1.Execute() then
+  begin
+    // Draw the bounds before saving
+    MatchObject();
+    SaveImageEnDialog1.AutoSetFilterFileType := ioPDF;
+    // Save the annotated PDF
+    ImageEnView1.IO.SaveToFilePDF(SaveImageEnDialog1.FileName);
+  end;
+end;
+
 procedure TForm1.MatchObject();
 begin
   var
@@ -162,28 +186,65 @@ begin
   MatchObject();
 end;
 
+//procedure TForm1.DrawBounds(objectIndex: Integer);
+//const
+//  c_Rect_Color = clRed;
+//  c_Rect_Border = 1;
+//  c_Rect_Opacity = 0;
+//  c_Rect_Offset = 2; // To add some extra space in the bounds
+//var
+//  lObj: TPdfObject;
+//
+//begin
+//  lObj := ImageEnView1.PdfViewer.Objects.AddRect
+//    (ImageEnView1.PdfViewer.Objects[objectIndex].X,
+//    ImageEnView1.PdfViewer.Objects[objectIndex].Y,
+//    FindObjWidth(ImageEnView1.PdfViewer.Objects[objectIndex]) + c_Rect_Offset,
+//    FindObjHeight(ImageEnView1.PdfViewer.Objects[objectIndex]) + c_Rect_Offset);
+//
+//  lObj.StrokeColor := TColor2TRGBA(c_Rect_Color, 255);
+//  lObj.PathStrokeWidth := c_Rect_Border;
+//  lObj.FillColor := TColor2TRGBA(c_Rect_Opacity);
+//  lObj.PathFillMode := pfAlternate;
+//
+//  ImageEnView1.Invalidate();
+//end;
+
+
+//procedure TForm1.DrawBounds(objectIndex: Integer);
+//const
+//  c_Rect_Color = clRed;
+//  c_Rect_Border = 1;
+//  c_Rect_Offset = 2; // To add some extra space in the bounds
+//var
+//  X, Y, Width, Height: Integer;
+//  Obj: TPdfObject;
+//begin
+//  Obj := ImageEnView1.PdfViewer.Objects[objectIndex];
+//  X := Obj.Bounds.Left;
+//  Y := Obj.Bounds.Top;
+//  Width := FindObjWidth(Obj) + c_Rect_Offset;
+//  Height := FindObjHeight(Obj) + c_Rect_Offset;
+//
+//  ImageEnView1.LayersAdd(iesRectangle, Rect(X, Y, X + Width, Y + Height), c_Rect_Color, c_Rect_Border);
+//end;
+
 procedure TForm1.DrawBounds(objectIndex: Integer);
 const
   c_Rect_Color = clRed;
   c_Rect_Border = 1;
-  c_Rect_Opacity = 0;
   c_Rect_Offset = 2; // To add some extra space in the bounds
 var
-  lObj: TPdfObject;
-
+  X, Y, Width, Height: Integer;
+  Obj: TPdfObject;
 begin
-  lObj := ImageEnView1.PdfViewer.Objects.AddRect
-    (ImageEnView1.PdfViewer.Objects[objectIndex].X,
-    ImageEnView1.PdfViewer.Objects[objectIndex].Y,
-    FindObjWidth(ImageEnView1.PdfViewer.Objects[objectIndex]) + c_Rect_Offset,
-    FindObjHeight(ImageEnView1.PdfViewer.Objects[objectIndex]) + c_Rect_Offset);
+  Obj := ImageEnView1.PdfViewer.Objects[objectIndex];
+  X := Obj.Bounds.Left;
+  Y := Obj.Bounds.Top;
+  Width := FindObjWidth(Obj) + c_Rect_Offset;
+  Height := FindObjHeight(Obj) + c_Rect_Offset;
 
-  lObj.StrokeColor := TColor2TRGBA(c_Rect_Color, 255);
-  lObj.PathStrokeWidth := c_Rect_Border;
-  lObj.FillColor := TColor2TRGBA(c_Rect_Opacity);
-  lObj.PathFillMode := pfAlternate;
-
-  ImageEnView1.Invalidate();
+  // Add a rectangle layer with specified bounds
+  ImageEnView1.LayersAdd(iesRectangle, Rect(X, Y, X + Width, Y + Height), c_Rect_Color, c_Rect_Border);
 end;
-
 end.

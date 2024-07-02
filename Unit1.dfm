@@ -81,6 +81,16 @@ object Form1: TForm1
       Font.Style = []
       ParentFont = False
     end
+    object saveButton: TcxButton
+      Left = 979
+      Top = 16
+      Width = 75
+      Height = 23
+      Anchors = [akTop, akRight, akBottom]
+      Caption = 'Export'
+      TabOrder = 0
+      OnClick = saveButtonClick
+    end
   end
   object DataSource1: TDataSource
     DataSet = FClientDataSet1
@@ -98,6 +108,10 @@ object Form1: TForm1
     Aggregates = <>
     Params = <>
     Left = 728
+    Top = 72
+  end
+  object SaveImageEnDialog1: TSaveImageEnDialog
+    Left = 824
     Top = 72
   end
 end

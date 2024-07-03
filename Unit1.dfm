@@ -32,10 +32,10 @@ object Form1: TForm1
     Align = alRight
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
-    object cxGrid1DBTableView1: TcxGridDBTableView
+    object gv: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       ScrollbarAnnotations.CustomAnnotations = <>
-      DataController.DataSource = DataSource1
+      DataController.DataSource = ds
       DataController.Summary.DefaultGroupSummaryItems = <>
       DataController.Summary.FooterSummaryItems = <>
       DataController.Summary.SummaryGroups = <>
@@ -52,10 +52,10 @@ object Form1: TForm1
       end
     end
     object cxGrid1Level1: TcxGridLevel
-      GridView = cxGrid1DBTableView1
+      GridView = gv
     end
   end
-  object Panel1: TPanel
+  object pn: TPanel
     Left = 0
     Top = 574
     Width = 1071
@@ -65,7 +65,7 @@ object Form1: TForm1
     DesignSize = (
       1071
       48)
-    object Label1: TLabel
+    object lb: TLabel
       Left = 0
       Top = 16
       Width = 749
@@ -81,7 +81,7 @@ object Form1: TForm1
       Font.Style = []
       ParentFont = False
     end
-    object saveButton: TcxButton
+    object saveBtn: TcxButton
       Left = 979
       Top = 16
       Width = 75
@@ -89,15 +89,15 @@ object Form1: TForm1
       Anchors = [akTop, akRight, akBottom]
       Caption = 'Export'
       TabOrder = 0
-      OnClick = saveButtonClick
+      OnClick = saveBtnClick
     end
   end
-  object DataSource1: TDataSource
-    DataSet = FClientDataSet1
+  object ds: TDataSource
+    DataSet = cds
     Left = 656
     Top = 72
   end
-  object FClientDataSet1: TClientDataSet
+  object cds: TClientDataSet
     PersistDataPacket.Data = {
       800000009619E0BD0100000018000000030001000000030000005A000354494E
       01004A0010000100055749445448020002000F00044E414D4501004A00100001
@@ -110,8 +110,13 @@ object Form1: TForm1
     Left = 728
     Top = 72
   end
-  object SaveImageEnDialog1: TSaveImageEnDialog
+  object SaveImageEnDialog: TSaveImageEnDialog
     Left = 824
+    Top = 72
+  end
+  object SaveDialog1: TSaveDialog
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
+    Left = 928
     Top = 72
   end
 end
